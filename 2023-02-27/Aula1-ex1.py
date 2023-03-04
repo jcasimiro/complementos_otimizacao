@@ -1,5 +1,5 @@
 
-file = open("grafo.txt", "r")
+file = open("2023-02-27/grafo.txt", "r")
 n = int(file.readline())
 n_arestas = int(file.readline())
 m_adj = [[0 for i in range(n+1)] for j in range(n+1)]
