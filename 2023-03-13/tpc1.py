@@ -36,8 +36,12 @@ def dfs(matriz, x, y, visitas, depth):
         depth += 1
         if y < max_y-1:
             dfs(matriz, x, y+1, visitas, depth)
+        if y > 0:
+            dfs(matriz, x, y-1, visitas, depth)
         if x < max_x-1:
             dfs(matriz, x+1, y, visitas, depth)
+        if x > 0:
+            dfs(matriz, x-1, y, visitas, depth)
 
     # continuar a pesquisar a matriz
     if depth == 0:
