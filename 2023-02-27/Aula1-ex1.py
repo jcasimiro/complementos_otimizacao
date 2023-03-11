@@ -1,4 +1,3 @@
-
 file = open("2023-02-27/grafo.txt", "r")
 n = int(file.readline())
 n_arestas = int(file.readline())
