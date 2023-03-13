@@ -1,7 +1,6 @@
 # ------------------------------
 # TPC 1 - José Casimiro (A51113)
 # ------------------------------
-
 output = []
 
 def read_matrix(filename):
@@ -50,6 +49,13 @@ def dfs(matriz, x, y, visitas, depth):
                 if visitas[vx][vy] == 0:
                     dfs(matriz, vx, vy, visitas, 0)
 
+def write_output(filename, numero_pecas, maior_peca):
+    file = open(filename, "w", encoding="utf-8")
+    file.write(numero_pecas)
+    file.write("\n")
+    file.write(maior_peca)
+    file.close()
+
 def main():
     game_matrix = read_matrix("2023-03-13/tabela_tetris.txt")
     visitas_matriz = [[0 for i in range(len(game_matrix[0]))] for j in range(len(game_matrix))]
@@ -57,7 +63,7 @@ def main():
     print("Número de peças: " + str(len(output)))
     print("Maior peça: " + str(max(output)))
     print(output)
-    #write file
+    write_output("2023-03-13/output.txt", str(len(output)), str(max(output)))
 
 if __name__ == "__main__":
     main()
