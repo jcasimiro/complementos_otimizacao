@@ -49,20 +49,45 @@ def is_full_circle_inside_square(x_square, y_square, l_square, x_circle, y_circl
         inside = inside and distances[i] >= r_circle   
     return inside
 
-#calcular a area aproximada de intersecao
+#verifica se o quadrado e circulo nao se intersetam
+def square_and_circle_not_intersect(x_square, y_square, l_square, x_circle, y_circle, r_circle):
+    #calcular a distancia entre o centro do quadrado e o centro do circulo
+    distance_x = abs(((x_square+l_square)/2)-x_circle)
+    distance_y = abs(((y_square+l_square)/2)-x_circle)
+    distance = math.sqrt(distance_x**2 + distance_y**2)
+    #calcular metade da diagonal do quadrado
+    half_diagonal = l_square * math.sqrt(2) / 2
+    # verificar se as formas se intersetam
+    if distance > half_diagonal + r_circle:
+        return True
+    else:
+        return False
+    
+#calcular a area aproximada de interseção
 def calculate_approximate_intersection_area(x_square, y_square, l_square, x_circle, y_circle, r_circle):
-    x = x_square
-    y = y_square
     l = 0.01
     area = 0
-    while x < x_square + l_square:
-        while y < y_square + l_square:
-            dist_begin, dist_end = calculate_distance_square_2_circle(x, y, l, x_circle, y_circle)
-            if dist_begin <= r_circle and dist_end <= r_circle:
-                    area += l**2
-            y += l
-        y = y_square
-        x += l
+
+    #se quadrado e circulo nao se intersetam devolve area 0
+    if square_and_circle_not_intersect(x_square, y_square, l_square, x_circle, y_circle, r_circle):
+        return 0
+    
+    #se quadrado esta totalmente contido no circulo, devolve a area do quadrado
+    if is_square_inside_circle(x_square, y_square, l_square, x_circle, y_circle, r_circle):
+        return l_square**2
+    
+    #se o circulo esta totalmente dentro do quadrado, devolve a area do circulo
+    if is_full_circle_inside_square(x_square, y_square, l_square, x_circle, y_circle, r_circle):
+        return math.pi * r_circle**2
+
+    if l_square <= l:
+        return 0
+
+    #calcula a area de interseção
+    area += calculate_approximate_intersection_area(x_square, y_square, l_square / 2, x_circle, y_circle, r_circle)
+    area += calculate_approximate_intersection_area(x_square, y_square + l_square / 2, l_square / 2, x_circle, y_circle, r_circle)
+    area += calculate_approximate_intersection_area(x_square + l_square / 2, y_square, l_square / 2, x_circle, y_circle, r_circle)
+    area += calculate_approximate_intersection_area(x_square + l_square / 2, y_square + l_square / 2, l_square / 2, x_circle, y_circle, r_circle)
     return area
 
 #calcular a area de interseção entre o quadrado e circulo
@@ -75,12 +100,7 @@ def calculate_intersection_area_square_circle(shapes_data):
     x_circle = float(shapes_data[3])
     y_circle = float(shapes_data[4])
     r_circle = float(shapes_data[5])
-    #calcula a area da intersecao das formas
-    if is_square_inside_circle(x_square, y_square, l_square, x_circle, y_circle, r_circle):
-        return l_square**2
-    if is_full_circle_inside_square(x_square, y_square, l_square, x_circle, y_circle, r_circle):
-        return math.pi * r_circle**2
-    
+    #calcula a area da intersecao das formas    
     return calculate_approximate_intersection_area(x_square, y_square, l_square, x_circle, y_circle, r_circle)
 
 #função principal/orquestração 

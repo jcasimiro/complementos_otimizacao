@@ -26,31 +26,37 @@ def write_output(filename, max_sum, subsequence):
 #calcula a sub-sequencia cuja soma dos elementos e a maior
 #devolve a soma e sequencia
 def max_subsequence_sum(seq):
-    max_sum = seq[0]
-    current_max_sum = seq[0]
-    start = 0
-    end = 0
-    current_start = 0
-
-    for i in range(1, len(seq)):
-        if seq[i] > current_max_sum + seq[i]:
-            current_start = i
-
-        current_max_sum = max(seq[i], current_max_sum + seq[i])
-
-        if current_max_sum > max_sum:
-            max_sum = current_max_sum
-            start = current_start
-            end = i
-
-    return max_sum, seq[start:end+1]
+    if len(seq) == 1:
+        return seq[0], [seq[0]]
+    else:
+        mid = len(seq) // 2
+        left_max, left_seq = max_subsequence_sum(seq[:mid])
+        right_max, right_seq = max_subsequence_sum(seq[mid:])
+        
+        #encontrar a soma maxima da subsequencia incluindo o elemento do meio
+        max_left = seq[mid-1]
+        left_idx = mid - 1
+        for i in range(mid-1, -1, -1):
+            if seq[i] > max_left:
+                max_left = seq[i]
+                left_idx = i
+        
+        max_right = seq[mid]
+        right_idx = mid
+        for i in range(mid, len(seq)):
+            if seq[i] > max_right:
+                max_right = seq[i]
+                right_idx = i
+        
+        mid_seq = seq[left_idx:right_idx+1]
+        mid_max = sum(mid_seq) if mid_seq else 0
+        
+        return max(left_max, right_max, mid_max), max(left_seq, mid_seq, right_seq, key=sum)
 
 #função principal / orquestração 
 def main():
     sequence = read_input("2023-03-25/input_ex3.txt")
     max_sum, subsequence = max_subsequence_sum(sequence)
-    print(max_sum)
-    print(subsequence)
     write_output("2023-03-25/output_ex3.txt", max_sum, subsequence)
 
 if __name__ == "__main__":

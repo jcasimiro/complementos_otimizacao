@@ -20,4 +20,5 @@ comprimento de cada sub-sequência é proporcional ao comprimento da sequência 
 
 Exercício 3, alínea b:
 ------------------------------------------------------------------------------------------------------
-A complexidade de tempo é O(n), onde 'n' é o tamanho da sequência.
+A complexidade de tempo do algoritmo recursivo é O(n log n), onde n é o comprimento da matriz de entrada.
+A complexidade espacial do algoritmo é O(log n), porque no máximo log n chamadas recursivas são feitas na pilha de chamadas.
