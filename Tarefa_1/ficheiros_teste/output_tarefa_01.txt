@@ -1,4 +1,4 @@
-armas 0
+armas -1
 armas
 
 engenheiro -1
@@ -10,12 +10,9 @@ citar
 caso -1
 casa
 
-casa 4
-cala
-calo
-cato
+casa -1
 cito
 
-os 1
+os -1
 as
 

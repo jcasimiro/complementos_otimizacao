@@ -1,11 +1,27 @@
 from collections import deque
 import time
 
+def word_to_number(word):
+    # Dictionary of prime numbers assigned to each letter of the alphabet
+    prime_nums = {'a': 2, 'b': 3, 'c': 5, 'd': 7, 'e': 11, 'f': 13, 'g': 17, 'h': 19, 'i': 23, 'j': 29,
+                  'k': 31, 'l': 37, 'm': 41, 'n': 43, 'o': 47, 'p': 53, 'q': 59, 'r': 61, 's': 67, 't': 71,
+                  'u': 73, 'v': 79, 'w': 83, 'x': 89, 'y': 97, 'z': 101}
+    
+    #multiply the prime numbers assigned to each letter to obtain the word's value
+    word_value = 1
+    for letter in word:
+        word_value *= prime_nums[letter.lower()]
+        
+    return word_value
+
 #read the dictionary file
 def read_dictionary(filename):
     with open(filename, "r") as file:
         dictionary = file.read().split()
-    return dictionary 
+    prime_dictionary = []
+    for word in dictionary:
+        prime_dictionary.append([word, word_to_number(word)])
+    return prime_dictionary 
 
 #read the input file
 def read_input(filename):
@@ -31,14 +47,14 @@ def merge(left, right):
     result = []
     i = j = 0
     while i < len(left) and j < len(right):
-        if len(left[i]) < len(right[j]):
+        if len(left[i][0]) < len(right[j][0]):
             result.append(left[i])
             i += 1
-        elif len(left[i]) > len(right[j]):
+        elif len(left[i][0]) > len(right[j][0]):
             result.append(right[j])
             j += 1
         else:
-            if left[i] < right[j]:
+            if left[i][0] < right[j][0]:
                 result.append(left[i])
                 i += 1
             else:
@@ -90,9 +106,7 @@ def get_words_with_distance_one(input_word, dictionary):
     return words_distance_1
 
 #calculate distances in dictionary
-def calculate_distances_dictionary(input_word, dictionary, saved_distances_dictionary):
-    
-    len_saved_distances_dictionary = len(saved_distances_dictionary)
+def calculate_distances_dictionary(input_word, dictionary):
 
     distances_dictionary = {}
 
@@ -110,11 +124,6 @@ def calculate_distances_dictionary(input_word, dictionary, saved_distances_dicti
         words_not_calculated.remove(word)
 
         for word_distance_one in words_with_distance_one:
-            if len_saved_distances_dictionary > 0:
-                if word_distance_one in saved_distances_dictionary:
-                    distances_dictionary[word_distance_one] = saved_distances_dictionary[word_distance_one]
-                    words_calculated.append(word_distance_one)
-                    break
             if not word_distance_one in words_not_calculated:
                 if not word_distance_one in words_calculated:
                         words_not_calculated.append(word_distance_one)
@@ -161,7 +170,7 @@ def main():
     #save the time the program started
     start_time = time.time()
     #read dictionary file
-    dictionary = read_dictionary("/workspaces/complementos_otimizacao/Tarefa_1/ficheiros_teste/mini_dic.txt")
+    dictionary = read_dictionary("/workspaces/complementos_otimizacao/Tarefa_1/ficheiros_teste/dicionario.txt")
     #read input file
     input_words = read_input("/workspaces/complementos_otimizacao/Tarefa_1/ficheiros_teste/input_01.txt")
     #output filename
@@ -170,8 +179,6 @@ def main():
     dictionary_sorted = merge_sort(dictionary)
     #save the output to a text variable
     output_txt = ""
-    #saved distances dictionaries
-    saved_distances_dictionary = {}
     #iterate through input values
     for pair in input_words:
         word_start = pair[0]
@@ -197,8 +204,7 @@ def main():
         #create a short dictionary
         short_dictionary = dictionary_sorted[start_index:end_index]
         #calculate distances
-        distances_dictionary = calculate_distances_dictionary(word_start, short_dictionary, saved_distances_dictionary)
-        saved_distances_dictionary.update(distances_dictionary)
+        distances_dictionary = calculate_distances_dictionary(word_start, short_dictionary)
         path = find_shortest_path(distances_dictionary, word_start, word_end)
         #verify if the path as been found
         if path:
