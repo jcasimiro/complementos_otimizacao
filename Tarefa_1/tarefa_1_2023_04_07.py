@@ -161,11 +161,11 @@ def main():
     #save the time the program started
     start_time = time.time()
     #read dictionary file
-    dictionary = read_dictionary("/workspaces/complementos_otimizacao/Tarefa_1/ficheiros_teste/mini_dic.txt")
+    dictionary = read_dictionary("/Users/josecasimiro/Projects/Isel/complementos_otimizacao/Tarefa_1/ficheiros_teste/mini_dic.txt")
     #read input file
-    input_words = read_input("/workspaces/complementos_otimizacao/Tarefa_1/ficheiros_teste/input_01.txt")
+    input_words = read_input("/Users/josecasimiro/Projects/Isel/complementos_otimizacao/Tarefa_1/ficheiros_teste/input_01.txt")
     #output filename
-    output_filename = "/workspaces/complementos_otimizacao/Tarefa_1/ficheiros_teste/output_tarefa_01.txt"
+    output_filename = "/Users/josecasimiro/Projects/Isel/complementos_otimizacao/Tarefa_1/ficheiros_teste/output_tarefa_01.txt"
     #sort the dictionary content by length and words
     dictionary_sorted = merge_sort(dictionary)
     #save the output to a text variable
