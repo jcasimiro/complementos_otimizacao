@@ -1,5 +1,6 @@
-from collections import deque
 import time
+
+#https://www.overleaf.com/project/64468a8ec144b8040e7b1c07
 
 #read the dictionary file
 def read_dictionary(filename):
@@ -71,73 +72,64 @@ def binary_search_length(dictionary, length):
 
 #calculate if words distance is equal to one.
 def is_distance_one(word1, word2):
-    if word1 == word2:
-        return False
     distance = 0
-    for i in range(len(word1)):
-        if word1[i] != word2[i]:
+    for c1, c2 in zip(word1, word2):
+        if c1 != c2:
             distance += 1
-        if ( distance > 1):
-            break
-    return distance==1
-
-#get all words with distance one from the dictionary for a given word
-def get_words_with_distance_one(input_word, dictionary):
-    words_distance_1 = []
-    for word in dictionary:
-        if is_distance_one(input_word, word):
-            words_distance_1.append(word)
-    return words_distance_1
+            if distance > 1:
+                return False
+    return distance == 1
 
 #calculate distances in dictionary
-def calculate_distances_dictionary(input_word, dictionary, saved_distances_dictionary):
-    
-    len_saved_distances_dictionary = len(saved_distances_dictionary)
+def calculate_distances_dictionary(dictionary):
 
-    distances_dictionary = {}
+    len_dictionary = len(dictionary)
 
-    words_not_calculated = []
-    words_calculated = []
+    #initialize distances
+    distances_dictionary = []
+    for i in range(0, len_dictionary):
+        distances_dictionary.append([])
 
-    words_not_calculated.append(input_word)
+    for i in range(0, len_dictionary):
+        word1 = dictionary[i]
 
-    while len(words_not_calculated) > 0:
-        word = words_not_calculated[0]
-        words_with_distance_one = get_words_with_distance_one(word, dictionary)
-        distances_dictionary[word] = words_with_distance_one
 
-        words_calculated.append(word)
-        words_not_calculated.remove(word)
+        for j in range(i+1, len_dictionary):
+            word2 = dictionary[j]
 
-        for word_distance_one in words_with_distance_one:
-            if len_saved_distances_dictionary > 0:
-                if word_distance_one in saved_distances_dictionary:
-                    distances_dictionary[word_distance_one] = saved_distances_dictionary[word_distance_one]
-                    words_calculated.append(word_distance_one)
-                    break
-            if not word_distance_one in words_not_calculated:
-                if not word_distance_one in words_calculated:
-                        words_not_calculated.append(word_distance_one)
+            if is_distance_one(word1, word2):
+                distances_dictionary[i].append(j)
+                distances_dictionary[j].append(i)
 
     return distances_dictionary
 
 # use breadth-first search to find the shortest path between the input words
-def find_shortest_path(distances_dictionary, word1, word2):
-    queue = deque([(word1,)])
-    visited = set([word1])
+
+def find_shortest_path( grafo, v_origem, v_destino):
+    # cria lista dos vértives visitados (inicializada a False)
+    visitado = [False] * len(grafo)
+    # cria uma lista que guarda, para cada vértice v, o menor número de arestas entre v_origem e v (inicializada a infinito).
+    dist = [float('inf')] * len(grafo)
+    # cria uma lista que guarda o caminho mínimo de v_origem a cada vértice v (inicializada a [])
+    caminho = [[] for i in range(len(grafo))]
     
-    while queue:
-        path = queue.popleft()
-        last_word = path[-1]
-        if last_word == word2:
-            return path
-        for word in distances_dictionary:
-            if word not in visited and word in distances_dictionary[last_word]:
-                new_path = path + (word,)
-                queue.append(new_path)
-                visited.add(word)
+    fila = []
+    fila.append(v_origem)
+    visitado[v_origem] = True
+    dist[v_origem] = 0
+    caminho[v_origem] = [v_origem]
     
-    return None
+    while fila:
+        u = fila.pop(0)
+        for v in grafo[u]:
+            if visitado[v] == False:
+                fila.append(v)
+                visitado[v] = True
+                dist[v] = dist[u] + 1
+                caminho[v] = caminho[u] + [v]
+                if v == v_destino:
+                    return (dist[v_destino], caminho[v_destino])
+    return (-1, [])
 
 #build the output text
 def build_output(path, value):
@@ -155,13 +147,22 @@ def save_result(output, filename):
     #save the output to file
     with open(filename, "w") as file:
         file.write(output)
+        
+
+def find_index_in_dictionary(word, dictionary):
+    index = -1
+    for i in range(0, len(dictionary)):
+        if word == dictionary[i]:
+            index = i
+            break
+    return index
 
 #main function
 def main():
     #save the time the program started
     start_time = time.time()
     #read dictionary file
-    dictionary = read_dictionary("/Users/josecasimiro/Projects/Isel/complementos_otimizacao/Tarefa_1/ficheiros_teste/mini_dic.txt")
+    dictionary = read_dictionary("/Users/josecasimiro/Projects/Isel/complementos_otimizacao/Tarefa_1/ficheiros_teste/dicionario.txt")
     #read input file
     input_words = read_input("/Users/josecasimiro/Projects/Isel/complementos_otimizacao/Tarefa_1/ficheiros_teste/input_01.txt")
     #output filename
@@ -170,12 +171,13 @@ def main():
     dictionary_sorted = merge_sort(dictionary)
     #save the output to a text variable
     output_txt = ""
-    #saved distances dictionaries
-    saved_distances_dictionary = {}
     #iterate through input values
+    dictionary_all_distances={}
     for pair in input_words:
         word_start = pair[0]
         word_end = pair[1]
+
+        print(word_start)
 
         if not word_start in dictionary_sorted or not word_end in dictionary_sorted:
             path = [word_start, word_end]
@@ -196,16 +198,30 @@ def main():
         start_index, end_index = binary_search_length(dictionary_sorted, len(word_start))
         #create a short dictionary
         short_dictionary = dictionary_sorted[start_index:end_index]
-        #calculate distances
-        distances_dictionary = calculate_distances_dictionary(word_start, short_dictionary, saved_distances_dictionary)
-        saved_distances_dictionary.update(distances_dictionary)
-        path = find_shortest_path(distances_dictionary, word_start, word_end)
-        #verify if the path as been found
-        if path:
-            output_txt += build_output(path, len(path)-1)
+        
+        if len(word_start) not in dictionary_all_distances:
+            distances_dictionary = calculate_distances_dictionary(short_dictionary)
+            dictionary_all_distances[len(word_start)] = distances_dictionary
         else:
-            path = [word_start, word_end]
-            output_txt += build_output(path, -1) 
+            distances_dictionary = dictionary_all_distances[len(word_start)]
+        
+        idx_a =find_index_in_dictionary(word_start, short_dictionary)
+        idx_b =find_index_in_dictionary(word_end, short_dictionary)
+        path = find_shortest_path(distances_dictionary, idx_a, idx_b)
+        path_words=[]
+
+        for i in range (path[0]+1):
+            if i ==0:
+                path_words.append(short_dictionary[path[1][i]])
+            else:
+                path_words.append(short_dictionary[path[1][i]])
+        #verify if the path as been found
+        if path_words:
+            output_txt += build_output(path_words, path[0])
+        else:
+            path_words = [word_start, word_end]
+            output_txt += build_output(path_words, -1) 
+
     #save output to file 
     save_result(output_txt, output_filename)
     #print output on screen

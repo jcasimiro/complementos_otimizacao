@@ -1,18 +1,28 @@
-670268 0
-670268
+armas 0
+armas
 
-52417103402917 -1
-52417103402917
+engenheiro 0
+engenheiro
 
-406626 -1
-996130
+zebra 9
+febra
+ferra
+cerra
+cerro
+corro
+corao
+corar
+cotar
+citar
 
-31490 -1
-1340
+caso 1
+casa
 
-1340 -1
-383755
+casa 3
+caso
+cato
+cito
 
-3149 -1
-134
+os 1
+as
 
