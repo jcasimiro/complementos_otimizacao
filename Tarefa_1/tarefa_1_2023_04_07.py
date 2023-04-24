@@ -164,7 +164,7 @@ def main():
     #read dictionary file
     dictionary = read_dictionary("/Users/josecasimiro/Projects/Isel/complementos_otimizacao/Tarefa_1/ficheiros_teste/dicionario.txt")
     #read input file
-    input_words = read_input("/Users/josecasimiro/Projects/Isel/complementos_otimizacao/Tarefa_1/ficheiros_teste/input_01.txt")
+    input_words = read_input("/Users/josecasimiro/Projects/Isel/complementos_otimizacao/Tarefa_1/ficheiros_teste/input_08.txt")
     #output filename
     output_filename = "/Users/josecasimiro/Projects/Isel/complementos_otimizacao/Tarefa_1/ficheiros_teste/output_tarefa_01.txt"
     #sort the dictionary content by length and words
