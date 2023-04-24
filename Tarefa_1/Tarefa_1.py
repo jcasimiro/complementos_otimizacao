@@ -1,250 +1,233 @@
-from collections import deque
 import time
-start = time.time()
+#read the dictionary file
+def read_dictionary(filename):
+    with open(filename, "r") as file:
+        dictionary = file.read().split()
+    return dictionary 
 
-def merge_sort(arr):
-    n = len(arr)
-    if ( n == 1):
-        return arr
-    
-    left = arr[:len(arr) // 2]
-    right = arr[len(arr) // 2:]
+#read the input file
+def read_input(filename):
+    with open(filename, "r") as file:
+        lines = file.readlines()
+    inputs = []
+    for line in lines:
+        values = line.rstrip().split()
+        inputs.append(values)
+    return inputs    
 
-    return merge(merge_sort(left), merge_sort(right))
+#merge sort
+def merge_sort(dictionary):
+    if len(dictionary) <= 1:
+        return dictionary
+    mid = len(dictionary) // 2
+    left = merge_sort(dictionary[:mid])
+    right = merge_sort(dictionary[mid:])
+    return merge(left, right)
 
-def merge(l, r):
-    m = len(l) + len(r)
-    s = []
-    l.append([0,float('inf')])
-    r.append([0,float('inf')])
+#merge 
+def merge(left, right):
+    result = []
     i = j = 0
-    for k in range(m):
-        if l[i][1] < r[j][1]:
-            s.append(l[i])
+    while i < len(left) and j < len(right):
+        if len(left[i]) < len(right[j]):
+            result.append(left[i])
             i += 1
-        else:
-            s.append(r[j])
+        elif len(left[i]) > len(right[j]):
+            result.append(right[j])
             j += 1
-    return s
+        else:
+            if left[i] < right[j]:
+                result.append(left[i])
+                i += 1
+            else:
+                result.append(right[j])
+                j += 1
+    result += left[i:]
+    result += right[j:]
+    return result
 
-def merge_dic(dicionario):
-    arr = []
-    for i in range(len(dicionario)):
-        arr.append([dicionario[i],len(dicionario[i])])
-    
-    arr = merge_sort(arr)
-    return arr
-        
-def binary_search_1(vector, number, mid, start_index=0): ## binary search para o index do numero que temos
-    if len(vector) == 1:
-        if vector[0][1] == number:
-            return start_index
-        else:
-            return False
-        
-    new_mid = len(vector) // 2
-    left = vector[:new_mid]
-    right = vector[new_mid:]
+#binary search
+def binary_search_length(dictionary, length):
+    left = 0
+    right = len(dictionary) - 1
 
-    if left[len(left)-1][1] >= number:
-        mid -= 1
-        return binary_search_1(left, number, mid, start_index)
-        
-    else:
-        if right[0][1] <= number:
-            mid += 1
-            return binary_search_1(right, number, mid, start_index + new_mid)
+    while left <= right:
+        mid = (left + right) // 2
+        if len(dictionary[mid]) == length:
+            start = end = mid
+            while start > 0 and len(dictionary[start-1]) == length:
+                start -= 1
+            while end < len(dictionary)-1 and len(dictionary[end+1]) == length:
+                end += 1
+            return start, end
+        elif len(dictionary[mid]) > length:
+            right = mid - 1
         else:
-            return False
-        
-def binary_search_2(vector, number, mid, start_index=0): ## binary search para o index do numero a frente
-    if len(vector) == 1:
-        if vector[0][1] > number:
-            return start_index
-        else:
-            return False
-        
-    new_mid = len(vector) // 2
-    left = vector[:new_mid]
-    right = vector[new_mid:]
+            left = mid + 1
 
-    if left[len(left)-1][1] > number:
-        mid -= 1
-        return binary_search_2(left, number, mid, start_index)
-        
-    else:
-        if right[0][1] <= number:
-            mid += 1
-            return binary_search_2(right, number, mid, start_index + new_mid)
-        else:
-            return start_index + new_mid
-        
-# calcular a distancia entre duas palavras
-def word_distance(word1, word2):
-    if word1 == word2:
-        return 0
+    return None
+
+#calculate if words distance is equal to one.
+def is_distance_one(word1, word2):
     distance = 0
-    for i in range(len(word1)):
-        if word1[i] != word2[i]:
+    for c1, c2 in zip(word1, word2):
+        if c1 != c2:
             distance += 1
-    return distance
+            if distance > 1:
+                return False
+    return distance == 1
 
-def print_distancia_palavras_distantes(array_desj):
-    for i in range (len(array_desj)):
-        if i == 0 : 
-            print ( array_desj[i],len(array_desj)-1)
-        else: 
-            print(array_desj[i])
+#calculate distances in dictionary
+def calculate_distances_dictionary(dictionary):
+
+    len_dictionary = len(dictionary)
+
+    #initialize distances
+    distances_dictionary = []
+    for i in range(0, len_dictionary):
+        distances_dictionary.append([])
+
+    for i in range(0, len_dictionary):
+        word1 = dictionary[i]
+
+
+        for j in range(i+1, len_dictionary):
+            word2 = dictionary[j]
+
+            if is_distance_one(word1, word2):
+                distances_dictionary[i].append(j)
+                distances_dictionary[j].append(i)
+    return distances_dictionary
+
+# use breadth-first search to find the shortest path between the input words
+
+def find_shortest_path( grafo, v_origem, v_destino):
+    # cria lista dos vértives visitados (inicializada a False)
+    visitado = [False] * len(grafo)
+    # cria uma lista que guarda, para cada vértice v, o menor número de arestas entre v_origem e v (inicializada a infinito).
+    dist = [float('inf')] * len(grafo)
+    # cria uma lista que guarda o caminho mínimo de v_origem a cada vértice v (inicializada a [])
+    caminho = [[] for i in range(len(grafo))]
+    
+    fila = []
+    fila.append(v_origem)
+    visitado[v_origem] = True
+    dist[v_origem] = 0
+    caminho[v_origem] = [v_origem]
+    
+    while fila:
+        u = fila.pop(0)
+        for v in grafo[u]:
+            if visitado[v] == False:
+                fila.append(v)
+                visitado[v] = True
+                dist[v] = dist[u] + 1
+                caminho[v] = caminho[u] + [v]
+                if v == v_destino:
+                    return (caminho[v_destino])
+    return ([])
+
+#build the output text
+def build_output(path, value):
+    output_txt = ""
+    for i in range(len(path)):
+        if i==0:
+            output_txt += f"{path[i]} {value}\n"
+        else:
+            output_txt += f"{path[i]}\n"
+    output_txt += "\n"
+    return output_txt
+
+#save the result to a file
+def save_result(output, filename):
+    #save the output to file
+    with open(filename, "w") as file:
+        file.write(output)
         
-def print_distancia_palavras_a_um_distancia(palavra_a,palavra_b):
-        print ( palavra_a,1)
-        print(palavra_b)
+
+def find_index_in_dictionary(word, dictionary):
+    index = -1
+    for i in range(0, len(dictionary)):
+        if word == dictionary[i]:
+            index = i
+            break
+    return index
+
+
+ 
+#main function
+def main():
+    #save the time the program started
+    start_time = time.time()
+    #read dictionary file
+    dictionary = read_dictionary("C:/Users/robuc/Desktop/College/MMAI/1ºYear/2ºSemester/CO/Tarefa_1/dicionario.txt")
+    #read input file
+    input_words = read_input("C:/Users/robuc/Desktop/College/MMAI/1ºYear/2ºSemester/CO/Tarefa_1/input_01.txt")
+    #output filename
+    output_filename = "C:/Users/robuc/Desktop/College/MMAI/1ºYear/2ºSemester/CO/Tarefa_1/output_tarefa_01.txt"
+    #sort the dictionary content by length and words
+    #sort the dictionary content by length and words
+    dictionary_sorted = merge_sort(dictionary)
+    
+    # dictionary_sorted = sorted(dictionary, key=lambda x: (len(x), x)) # Built-in python sort funtion -- diminiu 3 4 segundos
+
+    #save the output to a text variable
+    output_txt = ""
+    #create a dictionary that saves the distances for each length 
+    dictionary_all_distances={}
+    #iterate through input values
+    for pair in input_words:
+        word_start = pair[0]
+        word_end = pair[1]
+
+        if not word_start in dictionary_sorted or not word_end in dictionary_sorted:
+            path = [word_start, word_end]
+            output_txt += build_output(path, -1)
+            continue
         
-def print_distancia_palavras_iguais(palavra_a,palavra_b):
-        print ( palavra_a,0)
-        print(palavra_b)
+        if word_start == word_end:
+            path = [word_start, word_end]
+            output_txt += build_output(path, 0)
+            continue
+
+        if is_distance_one(word_start, word_end):
+            path = [word_start, word_end]
+            output_txt += build_output(path, 1)
+            continue
+
+        #search index start and end for dictionary given a word length
+        start_index, end_index = binary_search_length(dictionary_sorted, len(word_start))
+        #create a short dictionary
+        short_dictionary = dictionary_sorted[start_index:end_index]
         
-def print_impossivel_chegar(palavra_a,palavra_b):
-        print ( palavra_a,-1)
-        print(palavra_b)
-
-from collections import deque
-
-def busca_em_largura(words, palavra_a, palavra_b):
-    # create a set of all words in the input vector
-    if palavra_a not in words or palavra_b not in words:
-        return print_impossivel_chegar(palavra_a, palavra_b)
-    
-    # check if the input words are the same
-    if palavra_a == palavra_b:
-        return print_distancia_palavras_iguais(palavra_a, palavra_b)
-    
-    # check if the input words are adjacent
-    if word_distance(palavra_a, palavra_b) == 1:
-        return print_distancia_palavras_a_um_distancia(palavra_a, palavra_b)
-
-    # use breadth-first search to find the shortest path between the input words
-    def find_shortest_path(words, palavra_a, palavra_b):
-        queue = deque([(palavra_a,)])
-        visited = set([palavra_a])
+        if len(word_start) not in dictionary_all_distances:
+            distances_dictionary = calculate_distances_dictionary(short_dictionary)
+            dictionary_all_distances[len(word_start)] = distances_dictionary
+        else:
+            distances_dictionary = dictionary_all_distances[len(word_start)]
         
-        while queue:
-            path = queue.popleft()
-            last_word = path[-1]
-            if last_word == palavra_b:
-                return path
-            for word in words:
-                if word not in visited and word in words[last_word]:
-                    new_path = path + (word,)
-                    queue.append(new_path)
-                    visited.add(word)
         
-        return None
-    
-    # find the shortest path between the input words using breadth-first search
-    path = find_shortest_path(words, palavra_a, palavra_b)
-    
-    # print the results
-    if path:
-        print_distancia_palavras_distantes(path)
-    else:
-        print_impossivel_chegar(palavra_a, palavra_b)
-
-
-# def calcular_distancias_dicionario(words):
-#     dicionario_dist = {}
-
-#     for word1 in words:
-#         dicionario_dist[word1[0]]=[]
-#         for word2 in words:
-#             distance = word_distance(word1[0], word2[0])
-#             if distance == 1: 
-#                 if word2[0] not in dicionario_dist[word1[0]]:
-#                     dicionario_dist[word1[0]].append(word2[0])
-
-#     return dicionario_dist
-
-def calcular_distancias_dicionario(words):
-    
-    start_2 = time.time() 
-    dicionario_dist = {}
-
-    for word in words:
-        if dicionario_dist.get(word[0]) is None:
-            dicionario_dist[word[0]]=[]
-        for key in dicionario_dist:
-            distance = word_distance(key, word[0])
-            if distance == 1:
-                dicionario_dist[key].append(word[0])
-    
-    end_2 = time.time() 
-    print('Time :', end_2 - start_2)
-
-    return dicionario_dist
-
-#with open("C:/Users/robuc/Desktop/College/MMAI/1ºYear/2ºSemester/CO/Tarefa_1/dicionario.txt", "r") as file:
-with open("/Users/josecasimiro/Projects/Isel/complementos_otimizacao/Tarefa_1/ficheiros_teste/dicionario.txt", "r") as file:
-    dicionario = file.read()
-    words = dicionario.split()
-    
-dicionario_sorted=merge_dic(words)
-
-
-palavra_a = 'armas'
-palavra_b = 'armas'
-
-idx_a = binary_search_1(dicionario_sorted, len(palavra_a),len(dicionario_sorted)//2)
-idx_b = binary_search_2(dicionario_sorted, len(palavra_a),len(dicionario_sorted)//2)
-
-dic = calcular_distancias_dicionario(dicionario_sorted[idx_a:idx_b])
-#busca_em_largura(dicionario_sorted[idx_a:idx_b],palavra_a,palavra_b)
-busca_em_largura(dic,palavra_a,palavra_b)
-
-palavra_a = 'engenheiro'
-palavra_b = 'engenheiro'
-
-idx_a = binary_search_1(dicionario_sorted, len(palavra_a),len(dicionario_sorted)//2)
-idx_b = binary_search_2(dicionario_sorted, len(palavra_a),len(dicionario_sorted)//2)
-
-#busca_em_largura(dicionario_sorted[idx_a:idx_b],palavra_a,palavra_b)
-busca_em_largura(dic,palavra_a,palavra_b)
-
-palavra_a = 'zebra'
-palavra_b = 'citar'
-
-
-idx_a = binary_search_1(dicionario_sorted, len(palavra_a),len(dicionario_sorted)//2)
-idx_b = binary_search_2(dicionario_sorted, len(palavra_a),len(dicionario_sorted)//2)
-
-#busca_em_largura(dicionario_sorted[idx_a:idx_b],palavra_a,palavra_b)
-busca_em_largura(dic,palavra_a,palavra_b)
-
-palavra_a = 'caso'
-palavra_b = 'casa'
-
-idx_a = binary_search_1(dicionario_sorted, len(palavra_a),len(dicionario_sorted)//2)
-idx_b = binary_search_2(dicionario_sorted, len(palavra_a),len(dicionario_sorted)//2)
-
-#busca_em_largura(dicionario_sorted[idx_a:idx_b],palavra_a,palavra_b)
-busca_em_largura(dic,palavra_a,palavra_b)
-
-palavra_a = 'casa'
-palavra_b = 'cito'
-
-idx_a = binary_search_1(dicionario_sorted, len(palavra_a),len(dicionario_sorted)//2)
-idx_b = binary_search_2(dicionario_sorted, len(palavra_a),len(dicionario_sorted)//2)
-
-#busca_em_largura(dicionario_sorted[idx_a:idx_b],palavra_a,palavra_b)
-busca_em_largura(dic,palavra_a,palavra_b)
-
-palavra_a = 'os'
-palavra_b = 'as'
-
-idx_a = binary_search_1(dicionario_sorted, len(palavra_a),len(dicionario_sorted)//2)
-idx_b = binary_search_2(dicionario_sorted, len(palavra_a),len(dicionario_sorted)//2)
-
-#busca_em_largura(dicionario_sorted[idx_a:idx_b],palavra_a,palavra_b)
-busca_em_largura(dic,palavra_a,palavra_b)
-
-end = time.time()
-print('Time :', end - start)
+        idx_a =find_index_in_dictionary(word_start, short_dictionary)
+        idx_b =find_index_in_dictionary(word_end, short_dictionary)
+        path = find_shortest_path(distances_dictionary, idx_a, idx_b)
+        path_words=[]
+        for i in range (len(path)):
+            if i ==0:
+                path_words.append(short_dictionary[path[i]])
+            else:
+                path_words.append(short_dictionary[path[i]])
+        #verify if the path as been found
+        if path_words:
+            output_txt += build_output(path_words, len(path)-1)
+        else:
+            path_words = [word_start, word_end]
+            output_txt += build_output(path_words, -1) 
+    #save output to file 
+    save_result(output_txt, output_filename)
+    #print output on screen
+    print(output_txt)
+    #save the time the program ended
+    end_time = time.time()
+    print(f'Elapsed time: {end_time - start_time}')
+if __name__ == "__main__":
+    main()
