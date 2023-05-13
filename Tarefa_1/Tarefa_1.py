@@ -160,11 +160,11 @@ def main():
     #save the time the program started
     start_time = time.time()
     #read dictionary file
-    dictionary = read_dictionary("C:/Users/robuc/Desktop/College/MMAI/1ºYear/2ºSemester/CO/Tarefa_1/dicionario.txt")
+    dictionary = read_dictionary("/Users/josecasimiro/Projects/Isel/complementos_otimizacao/Tarefa_1/ficheiros_teste/dicionario.txt")
     #read input file
-    input_words = read_input("C:/Users/robuc/Desktop/College/MMAI/1ºYear/2ºSemester/CO/Tarefa_1/input_01.txt")
+    input_words = read_input("/Users/josecasimiro/Projects/Isel/complementos_otimizacao/Tarefa_1/ficheiros_teste/input_01.txt")
     #output filename
-    output_filename = "C:/Users/robuc/Desktop/College/MMAI/1ºYear/2ºSemester/CO/Tarefa_1/output_tarefa_01.txt"
+    output_filename = "/Users/josecasimiro/Projects/Isel/complementos_otimizacao/Tarefa_1/ficheiros_teste/output_tarefa_01.txt"
     #sort the dictionary content by length and words
     #sort the dictionary content by length and words
     dictionary_sorted = merge_sort(dictionary)
