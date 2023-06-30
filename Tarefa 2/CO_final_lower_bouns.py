@@ -45,7 +45,7 @@ class FordFulkerson:
                 path_flow = min(path_flow, self.graph[u][v])
                 
                 
-                print(str(v) + "-> (" + str(path_flow) + ") ->" + str(u))
+                print(str(u) + "-> (" + str(path_flow) + ") ->" + str(v))
                 
                 
                 v = u
@@ -56,6 +56,7 @@ class FordFulkerson:
                 u = self.graph[v]['parent']
                 self.graph[u][v] -= path_flow
                 self.flow[u][v] += path_flow
+                self.flow[v][u] -= path_flow
                 v = u
 
             max_flow += path_flow
@@ -124,10 +125,7 @@ capacities = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 ]
 
-
 demands = [-20, -8, -15, -18, 0, 0, 0, 0, 0 , 10, 20, 19, 12]
-
-
 
 lower_bounds = [
     [0, 1, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0],
@@ -145,18 +143,8 @@ lower_bounds = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 ]
 
-
-
-
-
 capacities_1, demands_1, lower_bounds_1 = remove_lower_bounds(capacities, demands, lower_bounds)
-
-
-
-
 capacities_2, demands_2, lower_bounds_2 = remove_demands(capacities_1, demands_1, lower_bounds_1)
-
-
 
 for row in capacities_2:
     print(row)
@@ -177,54 +165,4 @@ print("Fluxo máximo:", max_flow)
 max_flows_matrix = ff.get_flows()
 
 for row in max_flows_matrix:
-    print(row)
-    
-    
-    
-    
-adicoes = [
-    [0,7, 2, 3, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0,0],
-    [0,0, 1, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0,0],
-    [0,0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0,0],
-    [0,0, 0, 0, 0, 0, 3, 0, 1, 0, 0, 0, 0, 0,0],
-    [0,0, 0, 1, 0, 0, 0, 0, 1, 3, 0, 0, 0, 0,0],
-    [0,0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0,0],
-    [0,0, 0, 0, 0, 0, 0, 1, 0, 0, 3, 2, 2, 0,0],
-    [0,0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 2,0],
-    [0,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0,0],
-    [0,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0,0],
-    [0,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,7],
-    [0,0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0,0],
-    [0,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,8],
-    [0,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,2],
-    [0,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0],
-]
-
-
-    
-
-def add (max_flows_matrix, adicoes):
-
-    # Checking if the dimensions of the matrices are the same
-    if len(max_flows_matrix) != len(adicoes) or len(max_flows_matrix[0]) != len(adicoes[0]):
-        print("The matrices must have the same dimensions for addition.")
-    else:
-        # Creating an empty matrix to store the sum
-        sum_matrix = [[0 for _ in range(len(max_flows_matrix[0]))] for _ in range(len(max_flows_matrix))]
-    
-        # Performing element-wise addition and storing the result in sum_matrix
-        for i in range(len(max_flows_matrix)):
-            for j in range(len(max_flows_matrix[0])):
-                sum_matrix[i][j] = max_flows_matrix[i][j] + adicoes[i][j]
-    
-
-    return sum_matrix
-
-sum_matrix = add(max_flows_matrix, adicoes)
-
-max_flow = sum(sum_matrix[0])
-
-print("Fluxo máximo:", max_flow)
-
-for row in sum_matrix:
     print(row)

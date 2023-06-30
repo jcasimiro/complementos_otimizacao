@@ -2,7 +2,7 @@ from collections import deque
 import copy
 
 
-def dfs_augmenting_path(capacities, parent, visited, u, sink, path):
+def dfs_augmenting_path(capacities, parent, visited, u, sink):
     visited[u] = True
 
     if u == sink:
@@ -11,8 +11,7 @@ def dfs_augmenting_path(capacities, parent, visited, u, sink, path):
     for v in range(len(capacities)):
         if not visited[v] and capacities[u][v] > 0:
             parent[v] = u
-            if dfs_augmenting_path(capacities, parent, visited, v, sink, path):
-                path.append((u, v))
+            if dfs_augmenting_path(capacities, parent, visited, v, sink):
                 return True
 
     return False
@@ -43,19 +42,26 @@ def bellman_ford_max_flow_min_cost(capacities, costs, source, sink):
     while True:
         # Find an augmenting path using DFS
         visited = [False] * num_nodes
-        path = []
-        found_path = dfs_augmenting_path(capacities, parent, visited, source, sink, path)
+        found_path = dfs_augmenting_path(capacities, parent, visited, source, sink)
 
         if not found_path:
             break
 
         # Find the minimum capacity along the augmenting path
         min_capacity = float('inf')
-        for u, v in path:
+        v = sink
+        while v != source:
+            u = parent[v]
             min_capacity = min(min_capacity, capacities[u][v])
+            print(str(u) + "-> (" + str(min_capacity) + ") ->" + str(v))
+            v = u
+        
+        print("")
 
         # Update the flow and costs along the augmenting path
-        for u, v in path:
+        v = sink
+        while v != source:
+            u = parent[v]
             flow[u][v] += min_capacity
             flow[v][u] -= min_capacity
             total_cost += min_capacity * costs[u][v]
@@ -63,15 +69,12 @@ def bellman_ford_max_flow_min_cost(capacities, costs, source, sink):
             # Update costs for reverse edges
             costs[v][u] = -costs[u][v]
 
-        # Update capacities for forward and backward edges
-        for u, v in path:
+            # Update capacities for forward and backward edges
             capacities[u][v] -= min_capacity
             capacities[v][u] += min_capacity
-            
+            v = u
 
     return flow, total_cost
-
-
 
 capacities = [
     [0, 13, 6, 12, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -82,8 +85,8 @@ capacities = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0], 
     [0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 15, 12, 22, 0, 0], 
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 18, 0], 
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0], 
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 0, 0], 
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 9, 0, 0], 
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 7, 0], 
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3], 
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 11, 0, 20], 
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11], 
@@ -109,7 +112,10 @@ costs = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-]
+] 
+
+# Multiply all elements by 2
+#costs = [[2 * j for j in i] for i in costs]
 
 
 source = 0
@@ -122,54 +128,3 @@ for row in flow:
 print("Total cost:", total_cost)
 
 print("Total fluxo maximo:", sum(flow[0]))
-
-
-
-adicoes = [
-    [0,7, 2, 3, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0,0],
-    [0,0, 1, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0,0],
-    [0,0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0,0],
-    [0,0, 0, 0, 0, 0, 3, 0, 1, 0, 0, 0, 0, 0,0],
-    [0,0, 0, 1, 0, 0, 0, 0, 1, 3, 0, 0, 0, 0,0],
-    [0,0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0,0],
-    [0,0, 0, 0, 0, 0, 0, 1, 0, 0, 3, 2, 2, 0,0],
-    [0,0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 2,0],
-    [0,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0,0],
-    [0,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0,0],
-    [0,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,7],
-    [0,0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0,0],
-    [0,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,8],
-    [0,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,2],
-    [0,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0],
-]
-
-
-    
-print(len(flow))
-print(len(adicoes))
-
-def add (max_flows_matrix, adicoes):
-
-    # Checking if the dimensions of the matrices are the same
-    if len(max_flows_matrix) != len(adicoes) or len(max_flows_matrix[0]) != len(adicoes[0]):
-        print("The matrices must have the same dimensions for addition.")
-    else:
-        # Creating an empty matrix to store the sum
-        sum_matrix = [[0 for _ in range(len(max_flows_matrix[0]))] for _ in range(len(max_flows_matrix))]
-    
-        # Performing element-wise addition and storing the result in sum_matrix
-        for i in range(len(max_flows_matrix)):
-            for j in range(len(max_flows_matrix[0])):
-                sum_matrix[i][j] = max_flows_matrix[i][j] + adicoes[i][j]
-    
-
-    return sum_matrix
-
-sum_matrix = add(flow, adicoes)
-
-print("Total fluxo maximo:", sum(sum_matrix[0]))
-
-for row in sum_matrix:
-    print(row)
-
-print("Total cost:", total_cost)
